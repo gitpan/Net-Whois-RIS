@@ -27,7 +27,8 @@ sub new {
     my $self = {};
     bless $self, $class;
     $self->{host} = "ris.ripe.net";
-    $self->{url} = "http://www.ris.ripe.net/mt/mas/ajax.mas?_comp=%2Fmt%2Fmas%2Fdashboards.mas%3AgetPrefixesForASN&as=|ASN|&overview_div_graph_id=prefixes_graph_div&martian_warning_div=martian_ov&tabid=1&overview_div_pie_id=prefixes_pie_div&prefixes_graph_img=prefixes_graph_ov&prefixes_pie_img=prefixes_pie_ov%27";
+    $self->{url} =
+"http://www.ris.ripe.net/mt/mas/ajax.mas?_comp=%2Fmt%2Fmas%2Fdashboards.mas%3AgetPrefixesForASN&as=|ASN|&overview_div_graph_id=prefixes_graph_div&martian_warning_div=martian_ov&tabid=1&overview_div_pie_id=prefixes_pie_div&prefixes_graph_img=prefixes_graph_ov&prefixes_pie_img=prefixes_pie_ov%27";
     return $self;
 
 }
@@ -56,22 +57,27 @@ sub getIPInfo {
 
 sub getASNInfo {
 
-    my ( $self, $asn) = @_;
+    my ( $self, $asn ) = @_;
     use Scrappy;
 
     my $spidy = Scrappy->new;
-    my $url = $self->{url};
+    my $url   = $self->{url};
     $self->{prefixes} = "";
     $url =~ s/\|ASN\|/$asn/;
 
-    $spidy->crawl($url,{
+    $spidy->crawl(
+        $url,
+        {
             'table td a' => sub {
-                        my $data = shift->text;
-                        if (!($data =~ m/W/)) {
-                        $self->{prefixes} = $self->{prefixes}.$data."\n";
-                        }
-            }
-    });
+                my $data = shift->text;
+                if ( defined($data) ) {
+                    if ( !( $data =~ m/W/ ) ) {
+                        $self->{prefixes} = $self->{prefixes} . $data . "\n";
+                    }
+                }
+                else { $self->{prefixes} = undef; }
+        }}
+    );
 
     return $self;
 }
@@ -108,10 +114,10 @@ Net::Whois::RIS - Whois lookup on RIPE RIS
 
 =head1 VERSION
 
-Version 0.4
+Version 0.5
 
 =cut
-our $VERSION = '0.4';
+our $VERSION = '0.5';
 
 =head1 SYNOPSIS
 
